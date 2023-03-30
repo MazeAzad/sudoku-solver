@@ -7,13 +7,16 @@ const solveSudoku =(board)=>
     {
         digitsMap.set(`${i}`,i);
     }
-   
+    const initialBoard=[...board];
     const answer=(row,column,bRow,bColumn,rowCheck,columnCheck,BoxCheck,rowBoxHigh,columnBoxHigh)=>{
         if(bRow==-1)
         {
-                if(column>=9) return answer(row+1,0,bRow,bColumn,true,false,false,rowBoxHigh,columnBoxHigh);
-                if(row>=9) return board;
-                if(digitsMap.has(board[row][column])) return answer(row,column+1,bRow,bColumn,true,false,false,rowBoxHigh,columnBoxHigh);
+                if(column>=9) 
+                return answer(row+1,0,bRow,bColumn,true,false,false,rowBoxHigh,columnBoxHigh);
+                if(row>=9) 
+                return board;
+                if(digitsMap.has(board[row][column])) 
+                return answer(row,column+1,bRow,bColumn,true,false,false,rowBoxHigh,columnBoxHigh);
                 let answeredMap= new Map();
                 for(let i=0; i<9; ++i)
                 {
@@ -56,7 +59,7 @@ const solveSudoku =(board)=>
                 }
                 if(possibleAnswers.length==0)
                 {  
-                  return answer(row,column,row,column,true,false,false,rowBoxHigh,columnBoxHigh);
+                  return answer(row,column-1,row,column,true,false,false,rowBoxHigh,columnBoxHigh);
                 }
                 else
                 {
