@@ -7,16 +7,25 @@ const solveSudoku =(board)=>
     {
         digitsMap.set(`${i}`,i);
     }
-    const initialBoard=[...board];
+    const initialBoard=[];
+    for(let i=0;i<board.length;++i)
+    {   let innnerArray=[];
+        for(let j=0; j<board[i].length ; ++j)
+        {
+            innnerArray.push(board[i][j]);
+        }
+        initialBoard.push(innnerArray);
+    }
+    
     const answer=(row,column,bRow,bColumn,rowCheck,columnCheck,BoxCheck,rowBoxHigh,columnBoxHigh)=>{
         if(bRow==-1)
         {
                 if(column>=9) 
-                return answer(row+1,0,bRow,bColumn,true,false,false,rowBoxHigh,columnBoxHigh);
+                return answer(row+1,0,bRow,bColumn,rowCheck,columnCheck,BoxCheck,rowBoxHigh,columnBoxHigh);
                 if(row>=9) 
                 return board;
                 if(digitsMap.has(board[row][column])) 
-                return answer(row,column+1,bRow,bColumn,true,false,false,rowBoxHigh,columnBoxHigh);
+                return answer(row,column+1,bRow,bColumn,rowCheck,columnCheck,BoxCheck,rowBoxHigh,columnBoxHigh);
                 let answeredMap= new Map();
                 for(let i=0; i<9; ++i)
                 {
@@ -59,13 +68,13 @@ const solveSudoku =(board)=>
                 }
                 if(possibleAnswers.length==0)
                 {  
-                  return answer(row,column-1,row,column,true,false,false,rowBoxHigh,columnBoxHigh);
+                  return answer(row,column-1,row,column,rowCheck,columnCheck,BoxCheck,rowBoxHigh,columnBoxHigh);
                 }
                 else
                 {
                     board[row][column]=possibleAnswers[0];
                 }
-                return answer(row,column+1,bRow,bColumn,true,false,false,rowBoxHigh,columnBoxHigh,rowBoxHigh,columnBoxHigh);
+                return answer(row,column+1,bRow,bColumn,rowCheck,columnCheck,BoxCheck,rowBoxHigh,columnBoxHigh,rowBoxHigh,columnBoxHigh);
         }
         else 
         {     
@@ -73,36 +82,204 @@ const solveSudoku =(board)=>
                 if(rowCheck)
                 {   
                   
-                    if(column<=0) 
+                    if(column<0) 
                     {
-                        
-                        return answer(row,bColumn,bRow,bColumn,false,true,false,rowBoxHigh,columnBoxHigh);
+                         
+                        return answer(row-1,bColumn,bRow,bColumn,false,true,BoxCheck,rowBoxHigh,columnBoxHigh);
                     }
                     else
-                    {   
-                         return answer(row,column-1,bRow,bColumn,true,false,false,rowBoxHigh,columnBoxHigh);
+                    {    //ckeck if initialBoard[row][column] is equal to "."
+                         // find all posible answers for the cell without considersing the current value in possibilities
+                         // beacause we are sure that it'not going to work 
+                         // if find other possible answers ok 
+                         // else we go to other cell
+                         // we check the answer for the cell and we go to the troubled cell and we check for
+                         if(initialBoard[row][column]===".")
+                         {
+                            // finding all answered cells in row , column and box
+                            let answeredCells= new Set();
+                            // row check
+                            for(let i=0;i<9;++i)
+                            {
+                                if(board[row][i]!==".")
+                                {
+                                    answeredCells.add(board[row][i]);
+                                }
+                            }
+                            // column check
+                            for(let j=0; j<9 ; ++j)
+                            {
+                                if(board[j][column]!==".")
+                                {
+                                    answeredCells.add(board[j][column]);
+                                }
+                            }
+                            let lowRow=3*(Math.floor(row/3));
+                            let highRow=lowRow+2;
+                            let lowColumn=3*(Math.floor(column/3));
+                            let highColumn=lowColumn+2;
+                            for(let i=lowRow ; i<=highRow ; ++i)
+                            {
+                                for(let j=lowColumn ; j<=highColumn;++j)
+                                {
+                                    if(board[i][j]!==".")
+                                    {
+                                        answeredCells.add(board[i][j]);
+                                    }
+                                }
+                            }
+                            let possibleAnswers=[];
+                            for(let i=0;i<digitArray.length;++i)
+                            {
+                                if(answeredCells.has(digitArray[i])) continue;
+                                else possibleAnswers.push(digitArray[i]);
+                            }
+                            if(possibleAnswers.length>0)
+                            {
+                                for(let i=0; i<possibleAnswers.length;++i)
+                                {
+                                    board[row][column]=possibleAnswers[i];
+                                    return answer(bRow,bColumn,-1,-1,rowCheck,columnCheck,BoxCheck,)
+                                }
+                            }
+                         }
+                        
+                         return answer(row,column-1,bRow,bColumn,true,false,false,rowBoxHigh,columnBoxHigh,rowBoxHigh,columnBoxHigh);
                     }
                    
                 }
- 
+                
                 if(columnCheck)
-                {     
-                    if(row<=0)
-                    {
-                    columnCheck=false;
-                    BoxCheck=true;
-                    let q=Math.floor(row/3);
-                    let lowRow=q*3;
-                    q=Math.floor(bColumn/3);
-                    let lowColumn=q*3;
-                    firsTime=true;
-                    return answer(lowRow,lowColumn,bRow,bColumn,false,false,true,lowRow+2,lowColumn+2);
+                {  
+                    if(row<0)
+                    {   
+                        
+                        let q=Math.floor(bRow/3);
+                        let lowRow=q*3;
+                        q=Math.floor(bColumn/3);
+                        let lowColumn=q*3;
+                        firsTime=true;
+                        return answer(lowRow,lowColumn,bRow,bColumn,false,false,true,lowRow+2,lowColumn+2);
                     }
-                    return answer(row-1,column,bRow,bColumn,false,true,false,rowBoxHigh,columnBoxHigh)
+                    else
+                    {   
+                        
+                        if(initialBoard[row][column]===".")
+                        {
+                            
+                           // finding all answered cells in row , column and box
+                           let answeredCells= new Set();
+                           // row check
+                           for(let i=0;i<9;++i)
+                           {
+                               if(board[row][i]!==".")
+                               {
+                                   answeredCells.add(board[row][i]);
+                               }
+                           }
+                           // column check
+                           for(let j=0; j<9 ; ++j)
+                           {
+                               if(board[j][column]!==".")
+                               {
+                                   answeredCells.add(board[j][column]);
+                               }
+                           }
+                           let lowRow=3*(Math.floor(row/3));
+                           let highRow=lowRow+2;
+                           let lowColumn=3*(Math.floor(column/3));
+                           let highColumn=lowColumn+2;
+                           for(let i=lowRow ; i<=highRow ; ++i)
+                           {
+                               for(let j=lowColumn ; j<=highColumn;++j)
+                               {
+                                   if(board[i][j]!==".")
+                                   {
+                                       answeredCells.add(board[i][j]);
+                                   }
+                               }
+                           }
+                           let possibleAnswers=[];
+                           for(let i=0;i<digitArray.length;++i)
+                           {
+                               if(answeredCells.has(digitArray[i])) continue;
+                               else possibleAnswers.push(digitArray[i]);
+                           }
+                           if(possibleAnswers.length>0)
+                           {     
+                               for(let i=0; i<possibleAnswers.length;++i)
+                               {
+                                   board[row][column]=possibleAnswers[i];
+                                   return answer(bRow,bColumn,-1,-1,rowCheck,columnCheck,BoxCheck,)
+                               }
+                           }
+                        }    
+                     
+                        return answer(row-1,column,bRow,bColumn,rowCheck,columnCheck,BoxCheck,rowBoxHigh,columnBoxHigh)
+                    }
+                   
                 }
                 if(BoxCheck)
-                {   if(row===rowBoxHigh) return board;
-                    if(column===columnBoxHigh) return answer(row+1,column-2,bRow,bColumn,false,false,true,rowBoxHigh,columnBoxHigh);
+                {    
+ 
+
+                    
+                    if(column>columnBoxHigh)  return "hello"
+                    else
+                    {
+                        console.log(`row :${row} , column:${column}`);
+                        console.log(`row box high :${rowBoxHigh} , column box high :${columnBoxHigh}`);
+                    }
+                    // if(initialBoard[row][column]===".")
+                    //     {
+                    //        // finding all answered cells in row , column and box
+                    //        let answeredCells= new Set();
+                    //        // row check
+                    //        for(let i=0;i<9;++i)
+                    //        {
+                    //            if(board[row][i]!==".")
+                    //            {
+                    //                answeredCells.add(board[row][i]);
+                    //            }
+                    //        }
+                    //        // column check
+                    //        for(let j=0; j<9 ; ++j)
+                    //        {
+                    //            if(board[j][column]!==".")
+                    //            {
+                    //                answeredCells.add(board[j][column]);
+                    //            }
+                    //        }
+                    //        let lowRow=3*(Math.floor(row/3));
+                    //        let highRow=lowRow+2;
+                    //        let lowColumn=3*(Math.floor(column/3));
+                    //        let highColumn=lowColumn+2;
+                    //        for(let i=lowRow ; i<=highRow ; ++i)
+                    //        {
+                    //            for(let j=lowColumn ; j<=highColumn;++j)
+                    //            {
+                    //                if(board[i][j]!==".")
+                    //                {
+                    //                    answeredCells.add(board[i][j]);
+                    //                }
+                    //            }
+                    //        }
+                    //        let possibleAnswers=[];
+                    //        for(let i=0;i<digitArray.length;++i)
+                    //        {
+                    //            if(answeredCells.has(digitArray[i])) continue;
+                    //            else possibleAnswers.push(digitArray[i]);
+                    //        }
+                    //        console.log(answeredCells);
+                    //        if(possibleAnswers.length>0)
+                    //        {   
+                    //            for(let i=0; i<possibleAnswers.length;++i)
+                    //            {
+                    //                board[row][column]=possibleAnswers[i];
+                    //                return answer(bRow,bColumn,-1,-1,rowCheck,columnCheck,BoxCheck,)
+                    //            }
+                    //        }
+                    //     }    
                     return answer(row,column+1,bRow,bColumn,false,false,true,rowBoxHigh,columnBoxHigh)
                 }
     
